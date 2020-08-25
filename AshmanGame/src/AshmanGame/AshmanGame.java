@@ -94,11 +94,11 @@ public class AshmanGame extends Application{
     private MenuItem goMenuItem = new MenuItem("Go") ;
     private MenuItem pauseMenuItem = new MenuItem("Pause") ;
     private BorderPane root;
+    private Settings settings;
     
     @Override
     public void start(Stage primaryStage) {
-        Preferences pref = Preferences.userNodeForPackage(getClass());
-        Settings.readPreferences(this.getClass());
+        settings = new Settings(this.getClass());
         mStack = new StackPane();
         mStatus = new Label();
 
@@ -110,7 +110,7 @@ public class AshmanGame extends Application{
         
         ToolBar toolBar = new ToolBar(mStatus);
         root.setBottom(toolBar);
-        game = new GamePlay(mScene, mStack, mStatus, goMenuItem,pauseMenuItem);
+        onNew();
         primaryStage.setTitle("AshMan");
         primaryStage.setScene(mScene);
         primaryStage.show();
@@ -124,22 +124,32 @@ public class AshmanGame extends Application{
    //builds the menu bar. Game has pause, go, new, quit, settings, and about button options.
     public MenuBar buildMenuBar(){
         MenuBar menuBar = new MenuBar() ;
-        
-        //file menu
+        menuBar.getMenus().addAll(fileMenu(), gameMenu(), helpMenu()) ;
+        return menuBar ; 
+    }
+    
+    //creates fileMenu and returns it
+    private Menu fileMenu(){
         Menu fileMenu = new Menu("_File") ;
         MenuItem quitMenuItem = new MenuItem("_Quit") ;
         quitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q,
         KeyCombination.CONTROL_DOWN));
         quitMenuItem.setOnAction(actionEvent -> Platform.exit()) ;
         fileMenu.getItems().addAll(quitMenuItem);
-        
-        //help menu
+        return fileMenu;
+    }
+    
+    //creates helpMenu and returns it
+    private Menu helpMenu(){
         Menu helpMenu = new Menu("_Help") ;
         MenuItem aboutMenuItem = new MenuItem("_About") ;
         aboutMenuItem.setOnAction(actionEvent -> onAbout());
-        helpMenu.getItems().add(aboutMenuItem) ;
-        
-        //game menu
+        helpMenu.getItems().add(aboutMenuItem);
+        return helpMenu;
+    }
+    
+    //creates gameMenu and returns it
+    private Menu gameMenu(){
         Menu gameMenu = new Menu("_Game") ;
         MenuItem  newMenuItem = new MenuItem("New") ;
         MenuItem settingsMenuItem = new MenuItem("Settings") ;
@@ -152,11 +162,8 @@ public class AshmanGame extends Application{
         goMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.G));
         pauseMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P));
         settingsMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S,KeyCombination.CONTROL_DOWN));
-        
-        menuBar.getMenus().addAll(fileMenu, gameMenu,helpMenu) ;
-        return menuBar ; 
+        return gameMenu;
     }
-    
     
     private void onAbout(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -177,36 +184,42 @@ public class AshmanGame extends Application{
         
         TextField initGhostsEntry = new TextField();
         TextField additGhostsEntry = new TextField();
+        TextField numLevelsEntry = new TextField();
         
         ArrayList<TextField> entryArray = new ArrayList<TextField>();
-        initGhostsEntry.setText(Integer.toString(Settings.initGhosts));
-        additGhostsEntry.setText(Integer.toString(Settings.additGhosts));
-        Collections.addAll(entryArray, initGhostsEntry, additGhostsEntry);
+        initGhostsEntry.setText(Integer.toString(settings.getInitGhosts()));
+        additGhostsEntry.setText(Integer.toString(settings.getAdditGhosts()));
+        numLevelsEntry.setText(Integer.toString(settings.getNumLevels()));
+        
+        Collections.addAll(entryArray, initGhostsEntry, additGhostsEntry, numLevelsEntry);
         
         Text initGhostText = new Text();
         Text additGhostText = new Text();
+        Text numLevelsText = new Text();
 
         initGhostText.setText("Initial ghosts on level 1");
         additGhostText.setText("Additional ghosts per level");
-
+        numLevelsText.setText("Number of Levels (must reset game)");
+        
         grid.add(initGhostText,0,0);
         grid.add(additGhostText,0,1);
-
+        grid.add(numLevelsText,0,2);
+        
         grid.add(initGhostsEntry,1,0);
         grid.add(additGhostsEntry,1,1);
-           
+        grid.add(numLevelsEntry,1,2);
+        
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Preferences");
         dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
         dialog.getDialogPane().setContent(grid);
         Optional<ButtonType> result =dialog.showAndWait();
         
-        int[] preferences = Settings.getPreferences();
+        int[] preferences = settings.getPreferences();
         int[] newPreferences = new int[preferences.length];
         if(result.get()==okButton){
             try{
                int i = 0;
-               System.out.println(entryArray.size());
                for(TextField text : entryArray){
                   int temp;
                   if(text.getText().equals("")){
@@ -220,8 +233,8 @@ public class AshmanGame extends Application{
                    newPreferences[i]=temp;
                    i++;
                }
-               Settings.setPreferences(newPreferences);
-               Settings.storePreferences(this.getClass());
+               settings.setPreferences(newPreferences);
+               settings.storePreferences(this.getClass());
                }catch(Exception e){
                 onIntError();
             }    
@@ -238,7 +251,8 @@ public class AshmanGame extends Application{
      
     //starts a new game
     public void onNew(){
-        game = new GamePlay(mScene, mStack, mStatus, goMenuItem,pauseMenuItem);
+        settings = new Settings(this.getClass());
+        game = new GamePlay(mScene, mStack, mStatus, goMenuItem,pauseMenuItem, settings);
     }
 
    //starts game

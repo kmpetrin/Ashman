@@ -8,14 +8,14 @@ import java.util.prefs.Preferences;
  * by incrementing their x,y positions and then drawing themselves.  Characters start off in the middle of the cell, an increment or decrement of 
  * 20 total x or y coordinates moves the character to the middle of the next cell. The current settings make 4 increments of 5 to move the character from
  * one cell to the next.  When the character is in the middle of the cell, it's col/row position will be updated.
- * User preferences are also kept here.
+ * User preferences are also kept here, speed of characters, and number of ghosts each level.
  */
 public class Settings{
    
    static final int DOWN = 0, UP = 1, LEFT = 2, RIGHT = 3;
    //preferences set by user
-   public static int initGhosts;
-   public static int additGhosts;
+   private int initGhosts;
+   private int additGhosts;
    
    //settings that can't be changed by the user
    //speed is in milliseconds, so a increments it's positions every X milliseconds, where X is it's speed
@@ -38,21 +38,20 @@ public class Settings{
    /*number of increments a character has to reach before it is inside a new cell,
    * default setting the character moves 4 times in increments of 5 in order to change cells */
    static final int maxNumIncrements = 20;
-   private final int mAshStartDirection = -1;
-   
+   static final int ashStartDirection = -1;
+ 
    private int mNumLevels;
-   private int mCurrentLevel;
    private int mCurrentGhostSpeed;
    private int mCurrentGhostNum;
+   private int mHighScore;
    
-   public Settings(){
-      mNumLevels = 4;
+   public Settings(Class read){
+      readPreferences(read);
       mAshSpeed = 50;
       mGhostSpeedStart = mAshSpeed*2;
       mMaxGhostSpeed = mAshSpeed/2;
       mIncreaseGhostSpeedLvlBy = 25;
       mMaxGhostsNum = 100;
-      mCurrentLevel = 1;
       mCurrentGhostNum = initGhosts;
       mCurrentGhostSpeed=mGhostSpeedStart;
    }
@@ -76,20 +75,9 @@ public class Settings{
       return mCurrentGhostNum;
    }
    
-   //gets the current level
-   public int getCurrentLevel(){
-      return mCurrentLevel;
-   }
-   
-   //increments current level
-   public void setCurrentLevel(){
-      mCurrentLevel++;
-   }
-   
    //updates ghost speed when level changes
    public void updateGhostSpeed(){
       mCurrentGhostSpeed -= mIncreaseGhostSpeedLvlBy;
-      System.out.println(mCurrentGhostSpeed);
       if(mCurrentGhostSpeed < mMaxGhostSpeed){
          mCurrentGhostSpeed = mMaxGhostSpeed;
       }   
@@ -104,29 +92,74 @@ public class Settings{
    }
   
    //reads user preferences
-   public static void readPreferences(Class read){
+   public void readPreferences(Class read){
         Preferences pref = Preferences.userNodeForPackage(read);
         initGhosts = pref.getInt("initGhosts", 2);
         additGhosts = pref.getInt("additGhosts", 2);
+        mNumLevels = pref.getInt("mNumLevels", 4);
+        mHighScore = pref.getInt("mHighScore", 0);
     }
    
    //stores user preferences   
-   public static void storePreferences(Class store){
+   public void storePreferences(Class store){
         Preferences pref = Preferences.userNodeForPackage(store);
         pref.putInt("initGhosts", initGhosts);
         pref.putInt("additGhosts", additGhosts);
+        pref.putInt("mNumLevels", mNumLevels);
+        pref.putInt("mHighScore", mHighScore);
    }
     
    //gets list of preferences 
-   public static int[] getPreferences(){
-      return new int[]{initGhosts, additGhosts};
+   public int[] getPreferences(){
+      return new int[]{initGhosts, additGhosts, mNumLevels};
    }
    
    //sets the preferences 
-   public static void setPreferences(int[] newPreferences){    
+   public void setPreferences(int[] newPreferences){    
       initGhosts = newPreferences[0];
       additGhosts = newPreferences[1];
+      mNumLevels = newPreferences[2];
    }
 
-     
+   //gets the inital ghosts per level
+    public int getInitGhosts(){
+        return initGhosts;
+    }
+    
+    //gets the additional ghosts per level
+    public int getAdditGhosts(){
+        return additGhosts;
+    }
+    
+    //sets the inital ghosts per level
+    public void setInitGhosts(int init){
+        if(init >-1){
+            initGhosts = init;
+        }
+    }
+    
+    //sets number of additional ghosts per level
+    public void setAdditGhosts(int addit){
+        if(addit >-1){
+            additGhosts = addit;
+        }
+    }
+    
+    //sets number of levels for the game
+    public void setNumLevels(int num){
+        if(num > 0){
+            mNumLevels = num;
+        }
+    }
+    
+    //updates user's high score
+    public void setHighScore(int num){
+        if(num > 0 && num > mHighScore){
+            mHighScore = num;
+        }
+    }
+    
+    public int getHighScore(){
+        return mHighScore;
+    }
 }

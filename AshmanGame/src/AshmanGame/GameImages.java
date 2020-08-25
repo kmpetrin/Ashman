@@ -1,9 +1,14 @@
 package AshmanGame;
+import java.nio.file.InvalidPathException;
 import javafx.scene.image.Image;
-//contains text images used in game
+/*@author Kaylene
+ *08/20/2020
+ *Contains paths of images for easy changing of text images.
+*/
 public class GameImages{
-    public static final Image lose = new Image("images/YOU LOSE.png");
-    public static final Image win = new Image("images/YOU WIN!.png");
-    public static final Image clear = new Image("images/CLEAR.png");
-    public static final Image goImg = new Image("images/PRESS G TO GO.png");
+        public static String lose = "images/YOU LOSE.png";
+        public static String win = "images/YOU WIN!.png";
+        public static String go = "images/PRESS G TO GO.png";
+        public static String ghost = "images/ghost.png";
+    
 }

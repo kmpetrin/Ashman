@@ -28,8 +28,8 @@ public class TextDisplay extends Region{
     private Canvas mCanvas;
     private Image currentImg;
     
-    public TextDisplay(Image imgToStart){
-        currentImg = imgToStart;
+    public TextDisplay(String imgToStart){
+        setImage(imgToStart);
         mCanvas = new Canvas(Settings.LOGW*10, Settings.LOGH*10);
         super.setPrefSize(Settings.LOGW*100, Settings.LOGH*100); 
         super.setMinSize(Settings.LOGW/2, Settings.LOGH/2);
@@ -67,13 +67,22 @@ public class TextDisplay extends Region{
         double scaleY = mCanvas.getHeight()/Settings.LOGH;
         gc.scale(scaleX, scaleY);
         gc.translate(0, 0);
-        gc.drawImage(currentImg, 0, Settings.LOGH/4, Settings.LOGH, Settings.LOGW/2);
+        if(currentImg != null){
+            gc.drawImage(currentImg, 0, Settings.LOGH/4, Settings.LOGH, Settings.LOGW/2);
+        }
         gc.restore();
     }
     
-    //sets the current image
-    public void setImage(Image newImg){
-        currentImg = newImg;
+    //sets the current image by passing path
+    public void setImage(String path){
+        currentImg = new Image(path);
+    }
+    
+    //clears any current on screen text image
+    public void clearImage(){
+        GraphicsContext gc = mCanvas.getGraphicsContext2D();
+        gc.clearRect(0,0, mCanvas.getWidth(), mCanvas.getHeight());
+        currentImg = null;
     }
 
     

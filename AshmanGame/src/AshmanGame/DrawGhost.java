@@ -19,16 +19,20 @@ import javafx.scene.paint.Paint;
  * Draws the ghost over the particular cell, default cell is 20x20.  
  */
 public class DrawGhost extends DrawCharacter{
-    private Image ghost;
+    private Image mGhost;
     
    public DrawGhost(int rowCoord, int colCoord){
        super(rowCoord, colCoord);
-        ghost = new Image("images/ghost.png", 100, 100, false, false);
+       setGhostImage(GameImages.ghost);
    }
    
    //draws ghost at given coords
     public void drawChar(GraphicsContext gc) {
-      gc.drawImage(ghost, 0, 0, Settings.cellSize, Settings.cellSize);
+      gc.drawImage(mGhost, 0, 0, Settings.cellSize, Settings.cellSize);
+    }
+    
+    public void setGhostImage(String path){
+        mGhost = new Image(path, Settings.LOGW, Settings.LOGH, false, true);
     }
 }
 
