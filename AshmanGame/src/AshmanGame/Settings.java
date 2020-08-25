@@ -61,6 +61,7 @@ public class Settings{
       return mNumLevels;
    }
    
+   //gets ash's speed
    public int getAshSpeed(){
       return mAshSpeed;
    }

@@ -83,7 +83,6 @@ public class AshmanGame extends Application{
     private Stage mStage;
     private Maze mMaze;
     private Scene mScene;
-    private AshMan ash;
     private int numGhosts;
     private Ghost[] ghostArr;
     private StackPane mStack;
@@ -95,6 +94,11 @@ public class AshmanGame extends Application{
     private MenuItem pauseMenuItem = new MenuItem("Pause") ;
     private BorderPane root;
     private Settings settings;
+    private ButtonType mOkButton,mCancelButton;
+    private GridPane mGrid;
+    private TextField mInitGhostsEntry, mAdditGhostsEntry, mNumLevelsEntry;
+    private Dialog<ButtonType> mDialog;
+    private Optional<ButtonType> mResult;
     
     @Override
     public void start(Stage primaryStage) {
@@ -162,6 +166,7 @@ public class AshmanGame extends Application{
         goMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.G));
         pauseMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P));
         settingsMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S,KeyCombination.CONTROL_DOWN));
+        buildPreferencesDialog();
         return gameMenu;
     }
     
@@ -172,52 +177,54 @@ public class AshmanGame extends Application{
         alert.showAndWait();
     }
     
-     /*sets up the preferences, users have the ability to choose how many ghosts
-     * are at the start of each level and how many more to add at each next level.
-     * These preferences are saved for later gameplay.
-     */
+    /*partially builds the preferences dialog box
+    *intializes buttons and grid pane, along with text and text field
+    *for settings
+    */
+    private void buildPreferencesDialog(){
+        mOkButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        mCancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE); 
+        mGrid = new GridPane();
+        
+        mGrid.add(new Text("Initial ghosts on level 1"),0,0);
+        mGrid.add(new Text("Additional ghosts per level"),0,1);
+        mGrid.add(new Text("Number of Levels (must reset game)"),0,2);
+        
+        mInitGhostsEntry = new TextField();
+        mAdditGhostsEntry = new TextField();
+        mNumLevelsEntry = new TextField(); 
+        
+        
+        mGrid.add(mInitGhostsEntry,1,0);
+        mGrid.add(mAdditGhostsEntry,1,1);
+        mGrid.add(mNumLevelsEntry,1,2);    
+    }
+
+    //reads the user preferences 
+    private void readPreferencesFromSettings(){
+        mInitGhostsEntry.setText(Integer.toString(settings.getInitGhosts()));
+        mAdditGhostsEntry.setText(Integer.toString(settings.getAdditGhosts()));
+        mNumLevelsEntry.setText(Integer.toString(settings.getNumLevels()));
+    }
+    
+    /* dialog boxe pops up and pauses game allowing user to modify settings
+    * stores preferences if user enters valid input
+    */
      private void onPreferences() {
         game.pauseGame();
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);    
-        GridPane grid = new GridPane();
-        
-        TextField initGhostsEntry = new TextField();
-        TextField additGhostsEntry = new TextField();
-        TextField numLevelsEntry = new TextField();
+        readPreferencesFromSettings();
+        mDialog = new Dialog<>();
+        mDialog.setTitle("Preferences");
+        mDialog.getDialogPane().getButtonTypes().addAll(mOkButton, mCancelButton);
+        mDialog.getDialogPane().setContent(mGrid);
+        mResult = mDialog.showAndWait();    
         
         ArrayList<TextField> entryArray = new ArrayList<TextField>();
-        initGhostsEntry.setText(Integer.toString(settings.getInitGhosts()));
-        additGhostsEntry.setText(Integer.toString(settings.getAdditGhosts()));
-        numLevelsEntry.setText(Integer.toString(settings.getNumLevels()));
-        
-        Collections.addAll(entryArray, initGhostsEntry, additGhostsEntry, numLevelsEntry);
-        
-        Text initGhostText = new Text();
-        Text additGhostText = new Text();
-        Text numLevelsText = new Text();
-
-        initGhostText.setText("Initial ghosts on level 1");
-        additGhostText.setText("Additional ghosts per level");
-        numLevelsText.setText("Number of Levels (must reset game)");
-        
-        grid.add(initGhostText,0,0);
-        grid.add(additGhostText,0,1);
-        grid.add(numLevelsText,0,2);
-        
-        grid.add(initGhostsEntry,1,0);
-        grid.add(additGhostsEntry,1,1);
-        grid.add(numLevelsEntry,1,2);
-        
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Preferences");
-        dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
-        dialog.getDialogPane().setContent(grid);
-        Optional<ButtonType> result =dialog.showAndWait();
+        Collections.addAll(entryArray, mInitGhostsEntry, mAdditGhostsEntry, mNumLevelsEntry);
         
         int[] preferences = settings.getPreferences();
         int[] newPreferences = new int[preferences.length];
-        if(result.get()==okButton){
+        if(mResult.get()==mOkButton){
             try{
                int i = 0;
                for(TextField text : entryArray){
