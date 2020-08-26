@@ -4,65 +4,61 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import javafx.scene.media.AudioClip;
 
 /*
  *@author Kaylene
  *08/24/2020
- *Contains the in game audio, default audio clips are in the constructor
- *audio can be changed
+ *Plays url of audio assigned to mResource. Has default game audio but
+ *a URL can be passed in to assign a new audio file to mResource and play
+ *that sound.
  */
 public class GameSounds {
-    private URL mIntermission;
-    private URL mEatCake;
-    private URL mDeath;
-    private URL mTheme;
+    private URL mResource;
+    private int mVolume;
+    private AudioClip mSound;
     
     //default game audio sounds
     public GameSounds(){
-        mIntermission= getClass().getResource("/sounds/intermission.wav");
-        mEatCake = getClass().getResource("/sounds/eatcake.wav");
-        mDeath = getClass().getResource("/sounds/death.wav");
-        mTheme = getClass().getResource("/sounds/theme.wav");
+        mVolume = 1;
+        mResource = getClass().getResource("/sounds/intermission.wav");
+        mSound = new AudioClip(mResource.toString());
     }
     
-    //gets the audio played between level changes
-    public URL getOnIntermission(){
-        return mIntermission;
+    //plays default eat audioclip
+    public void playDefaultEat(){
+        mResource = getClass().getResource("/sounds/eatcake.wav");
+        playWav();
     }
     
-    //gets the audio played when ash eats a cake
-    public URL getOnEatCake(){
-        return mEatCake;
+    //plays default intermission audioclip
+    public void playDefaultIntermission(){
+        mResource = getClass().getResource("/sounds/intermission.wav");
+        playWav();
     }
     
-    //gets the audio played on ash's death
-    public URL getOnDeath(){
-        return mDeath;
+    //plays default death audioclip
+    public void playDefaultDeath(){
+        mResource = getClass().getResource("/sounds/death.wav");
+        playWav();
     }
     
-    //gets the audio played at beginning of game and on win
-    public URL getOnTheme(){
-        return mTheme;
-    }
-   
-    //Sets the audio played after each level is complete
-    public void setOnIntermission(URL path){
-        mIntermission = path;
+    //plays the default theme audioclip
+    public void playDefaultTheme(){
+        mResource = getClass().getResource("/sounds/theme.wav");
+        playWav();
     }
     
-    //Sets the audio played when ash eats a cake
-    public void setOnEatCake(URL path){
-        mEatCake = path;
+    //play sound from URL passed in
+    public void playSound(URL resource){
+        mResource = resource;
+        playWav();
     }
-    
-     //Sets the audio played on ash's death
-    public void setOnDeath(URL path){
-        mDeath = path;
-    }
-    
-    //Sets the audio played at the beginning of the game and on win
-    public void setOnTheme(URL path){
-        mTheme = path;
+      
+    //plays the audio
+    private void playWav(){
+        mSound = new AudioClip(mResource.toString());
+        mSound.play(mVolume);
     }
     
 }

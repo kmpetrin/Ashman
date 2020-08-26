@@ -67,7 +67,7 @@ public class GamePlay{
         mStatus = status;
         mAudio = new GameSounds();
         initializeGame();
-        playWav(mAudio.getOnTheme());
+        mAudio.playDefaultTheme();
     }
     
     /*intiializes game, creates timer, characters, maze, and adds canvases to stack. 
@@ -137,7 +137,7 @@ public class GamePlay{
             mMaze.removeCake(ash.getCurrRow(), ash.getCurrCol());
             cakeTotal = mMaze.getCakesLeft();
             score++;
-            playWav(mAudio.getOnEatCake());;
+            mAudio.playDefaultEat();
             updateStatus();
             onCheckWin();
         }
@@ -189,7 +189,7 @@ public class GamePlay{
     private boolean checkGhostAshCollision() {
         for(Character ghost : mGhostArr){
           if(ghost.getCurrCol() == ash.getCurrCol() && ghost.getCurrRow()==ash.getCurrRow()){
-               playWav(mAudio.getOnDeath());;
+               mAudio.playDefaultDeath();
                gameTimer.stop();
                text.setImage(GameImages.lose);
                text.draw();
@@ -221,10 +221,9 @@ public class GamePlay{
                 mSettings.updateGhostNum();
                 mSettings.updateGhostSpeed();
                 initializeGame();
-                playWav(mAudio.getOnIntermission());
-                
+                mAudio.playDefaultIntermission();               
             }else{
-               playWav(mAudio.getOnTheme());
+               mAudio.playDefaultIntermission();
                text.setImage(GameImages.win);
                text.draw();
             }       
@@ -369,11 +368,5 @@ public class GamePlay{
              }  
          }
      }
-      
-     //plays the audio that has been passed in
-    private void playWav(URL resource){
-        AudioClip sound = new AudioClip(resource.toString());
-        sound.play(1);
-    }
       
 }
